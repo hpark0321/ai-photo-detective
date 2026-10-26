@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><rect width="512" height="512" fill="#F26A21"/><g transform="translate(0 0) scale(1)">
+    <g transform="rotate(-9 200 220)"><rect x="80" y="96" width="240" height="250" rx="10" fill="#FFFFFF"/><rect x="98" y="114" width="204" height="170" fill="#0E8A7A"/><text x="200" y="232" font-family="Arial, sans-serif" font-weight="900" font-size="64" fill="#FFFFFF" text-anchor="middle">진짜?</text></g>
+    <g transform="rotate(8 320 200)"><rect x="200" y="76" width="240" height="250" rx="10" fill="#FFFFFF"/><rect x="218" y="94" width="204" height="170" fill="#8B3DFF"/><text x="320" y="212" font-family="Arial, sans-serif" font-weight="900" font-size="72" fill="#FFFFFF" text-anchor="middle">AI?</text></g>
+    <circle cx="318" cy="356" r="70" fill="rgba(255,255,255,0.3)" stroke="#14202B" stroke-width="20"/>
+    <line x1="370" y1="408" x2="438" y2="476" stroke="#14202B" stroke-width="32" stroke-linecap="round"/></g></svg>

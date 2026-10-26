@@ -1,0 +1,211 @@
+<title>AI 사진 탐정 사진 가이드</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap">
+<style>
+:root {
+  /* Layout: one column field notebook; sticky progress strip; each pair is a card with a copyable prompt */
+  --paper: #F4F6F8; --ink: #1B2733; --muted: #5C6B78; --line: #D4DBE1; --card: #FFFFFF;
+  --accent: #0E7C86; --accent-ink: #FFFFFF; --soft: #E3F1F2;
+  --t1: #2E7D32; --t1-bg: #E6F3E7; --t2: #B26A00; --t2-bg: #FFF1DC; --t3: #B3261E; --t3-bg: #FBE4E2; --t4: #4A3F9C; --t4-bg: #ECE9F8;
+  --focus: #1D6FD8; --font: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --paper: #141B22; --ink: #E7EDF2; --muted: #9DACB9; --line: #2A3641; --card: #1C252E; --accent: #3FB4BE; --accent-ink: #06201F; --soft: #16343A;
+  --t1: #7CD38A; --t1-bg: #17301B; --t2: #F2B35C; --t2-bg: #3A2A10; --t3: #F28B84; --t3-bg: #3A1A18; --t4: #B3A7F2; --t4-bg: #262042; color-scheme: dark; } }
+:root[data-theme="dark"] { --paper: #141B22; --ink: #E7EDF2; --muted: #9DACB9; --line: #2A3641; --card: #1C252E; --accent: #3FB4BE; --accent-ink: #06201F; --soft: #16343A;
+  --t1: #7CD38A; --t1-bg: #17301B; --t2: #F2B35C; --t2-bg: #3A2A10; --t3: #F28B84; --t3-bg: #3A1A18; --t4: #B3A7F2; --t4-bg: #262042; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font); font-size: 16px; line-height: 1.6; word-break: keep-all; }
+.wrap { max-width: 760px; margin: 0 auto; padding-block: 24px 64px; padding-inline: 16px; }
+h1 { font-size: 28px; font-weight: 900; line-height: 1.25; margin: 0 0 6px; text-wrap: balance; }
+h2 { font-size: 19px; font-weight: 700; margin: 36px 0 10px; }
+p { margin: 0 0 10px; }
+.lead { color: var(--muted); }
+.facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 18px 0 8px; }
+.fact { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; min-width: 0; }
+.fact b { display: block; font-size: 20px; font-weight: 900; line-height: 1.2; }
+.fact span { font-size: 12px; color: var(--muted); }
+.steps { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px 14px 34px; margin: 0; }
+.steps li { margin: 6px 0; }
+.steps li::marker { font-weight: 900; color: var(--accent); }
+.sticky { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--paper); padding: 10px 0 8px; display: flex; flex-direction: column; gap: 8px; }
+.bar { height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .3s; }
+.filters { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; }
+.chip { border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 999px; padding: 6px 12px; font-size: 13px; font-weight: 700; white-space: nowrap; cursor: pointer; min-height: 36px; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.prog { font-size: 13px; color: var(--muted); display: flex; justify-content: space-between; }
+.cards { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 14px 12px; display: flex; flex-direction: column; gap: 10px; }
+.card.done { opacity: .55; }
+.head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.tier { font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
+.tier.t1 { color: var(--t1); background: var(--t1-bg); } .tier.t2 { color: var(--t2); background: var(--t2-bg); } .tier.t3 { color: var(--t3); background: var(--t3-bg); } .tier.t4 { color: var(--t4); background: var(--t4-bg); }
+.id { font-weight: 900; font-variant-numeric: tabular-nums; }
+.title { font-weight: 700; font-size: 17px; }
+.row { display: grid; grid-template-columns: 74px 1fr; gap: 8px; font-size: 14px; }
+.row .k { color: var(--muted); font-weight: 700; }
+.prompt { position: relative; background: var(--soft); border-radius: 8px; padding: 10px 12px; font-size: 14px; line-height: 1.55; }
+.prompt code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; white-space: pre-wrap; word-break: break-word; display: block; padding-right: 0; }
+.actions { display: flex; gap: 8px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.copy { background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 8px; padding: 9px 14px; font: inherit; font-weight: 700; font-size: 14px; cursor: pointer; min-height: 40px; }
+.copy:active { transform: translateY(1px); }
+.check { display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; min-height: 40px; }
+.check input { width: 20px; height: 20px; accent-color: var(--accent); margin: 0; }
+.files { font-size: 12px; color: var(--muted); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+.note { background: var(--card); border-left: 4px solid var(--accent); border-radius: 0 10px 10px 0; padding: 12px 14px; margin: 10px 0; }
+ul.plain { padding-left: 20px; margin: 0; }
+ul.plain li { margin: 5px 0; }
+table { width: 100%; border-collapse: collapse; background: var(--card); font-size: 14px; }
+th, td { border: 1px solid var(--line); padding: 8px 10px; text-align: left; vertical-align: top; }
+th { background: var(--soft); width: 34%; }
+#toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); background: var(--ink); color: var(--paper); padding: 9px 16px; border-radius: 999px; font-size: 14px; opacity: 0; transition: .2s; pointer-events: none; }
+#toast.show { opacity: 1; transform: translate(-50%, 0); }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+@media (max-width: 420px) { .row { grid-template-columns: 1fr; gap: 2px; } .facts { grid-template-columns: 1fr 1fr 1fr; } .fact b { font-size: 17px; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <h1>AI 사진 탐정 사진 가이드</h1>
+  <p class="lead">'진짜 vs AI 사진' 게임에 넣을 사진 24쌍(48장)을 만드는 순서와 프롬프트입니다. 프롬프트는 복사 버튼으로 ChatGPT, Gemini, Copilot, Canva 등 이미지 생성 도구에 그대로 붙여 넣으면 됩니다.</p>
+  <div class="facts">
+    <div class="fact"><b>24쌍</b><span>쉬움 8 · 중간 8 · 어려움 4 · 편집 4</span></div>
+    <div class="fact"><b>약 40분</b><span>AI 사진 24장 생성</span></div>
+    <div class="fact"><b>12쌍</b><span>이것만 있어도 시작 가능</span></div>
+  </div>
+
+  <h2>만드는 순서</h2>
+  <ol class="steps">
+    <li><b>진짜 사진을 먼저 고릅니다.</b> 휴대폰에 있는 사진, 캠퍼스·주차장·마트에서 새로 찍은 사진, 항만 견학 사진이면 충분합니다. 사람 얼굴은 피하세요(초상권).</li>
+    <li><b>같은 장면의 AI 사진을 만듭니다.</b> 아래 프롬프트를 붙여 넣되, 진짜 사진과 비슷하게 색·시간대·구도 한두 단어를 고치면 쌍이 더 자연스럽습니다.</li>
+    <li><b>원본 파일로 저장합니다.</b> 화면 캡처 대신 다운로드 버튼으로 저장하고, 긴 변 1,024px 이상이면 됩니다.</li>
+    <li><b>파일 이름을 규칙대로 붙입니다.</b> <code>p01_real.jpg</code>와 <code>p01_ai.jpg</code>처럼 짝을 맞추면 앱의 팩 빌더가 자동으로 쌍을 인식합니다.</li>
+    <li><b>출처를 한 줄씩 적어 둡니다.</b> 진짜 사진은 촬영자·장소·날짜(또는 내려받은 곳과 라이선스), AI 사진은 사용한 도구 이름이면 됩니다.</li>
+  </ol>
+
+  <div class="sticky">
+    <div class="prog"><span id="prog-text">완료 0 / 24</span><span>체크 표시는 이 기기에만 저장됩니다</span></div>
+    <div class="bar"><i id="prog-bar"></i></div>
+    <div class="filters" role="group" aria-label="난이도 필터">
+      <button type="button" class="chip" data-f="all" aria-pressed="true">전체</button>
+      <button type="button" class="chip" data-f="t1" aria-pressed="false">쉬움 · 글자·손</button>
+      <button type="button" class="chip" data-f="t2" aria-pressed="false">중간 · 물리·빛</button>
+      <button type="button" class="chip" data-f="t3" aria-pressed="false">어려움 · 단서 없음</button>
+      <button type="button" class="chip" data-f="t4" aria-pressed="false">편집 · 바뀐 곳 찾기</button>
+    </div>
+  </div>
+
+  <div class="cards" id="cards"></div>
+
+  <h2>편집본(어려움 3단계)은 이렇게 만듭니다</h2>
+  <div class="note">
+    <p>진짜 사진 한 장을 그대로 두고(<code>e01_orig.jpg</code>), 생성형 편집 기능으로 손상만 덧붙인 사본(<code>e01_edit.jpg</code>)을 만듭니다. 보험업계가 실제로 보고한 수법(앞유리에 금 추가, 가구에 얼룩 추가)과 같아서 교육 효과가 가장 큽니다.</p>
+    <ul class="plain">
+      <li><b>갤럭시</b>: 갤러리 → 사진 편집 → 생성형 편집(또는 포토 어시스트)</li>
+      <li><b>아이폰·안드로이드 공통</b>: Google 포토 매직 에디터, Canva 매직 편집, Adobe Express 생성형 채우기</li>
+      <li><b>PC</b>: Photoshop 생성형 채우기</li>
+      <li><b>ChatGPT·Gemini</b>: 사진을 올리고 "이 컨테이너 옆면에 큰 찌그러짐과 긁힌 자국을 추가해 줘"처럼 요청</li>
+    </ul>
+  </div>
+
+  <h2>원본 vs AI 보정 쌍(앱에 들어 있는 형식)을 더 만들 때</h2>
+  <div class="note">
+    <p>앱에 들어 있는 30쌍은 위키미디어 공용의 풍경 사진 원본(<code>pNN_real.jpg</code>)과, 같은 사진을 AI로 색감 보정하고 살짝 잘라 재구도한 보정본(<code>pNN_ai.jpg</code>)입니다. 보정은 여섯 가지 느낌 중 하나입니다: 저녁빛(따뜻한 톤), 아침빛(푸른 톤), 한낮(밝게), 흐린 날(채도 낮춤), 새벽 안개(뿌옇게), 선명하게(채도·선명도 올림). 이 형식은 "AI 티"가 거의 없어 어렵고, 디자인 수업에서는 <b>보정의 방향(톤·대비·채도·안개·잘림)</b>을 읽는 연습이 됩니다.</p>
+    <ul class="plain">
+      <li><b>갤럭시</b>: 갤러리 → 편집 → 리마스터 / 포토 어시스트의 톤 조정. <b>아이폰</b>: 사진 앱 자동 보정 뒤 분위기 슬라이더, 또는 Google 포토의 AI 보정(향상·다이내믹·따뜻함 등).</li>
+      <li><b>PC·태블릿</b>: Lightroom의 적응형 프리셋, Canva 매직 스튜디오 필터, Photoshop 뉴럴 필터(풍경 믹서).</li>
+      <li><b>ChatGPT·Gemini</b>: 사진을 올리고 "이 사진을 해 질 녘 따뜻한 빛으로 자연스럽게 보정하고, 구도만 살짝 당겨 줘. 사물은 추가하지 마."처럼 요청하면 비슷한 쌍이 됩니다.</li>
+      <li>파일 이름은 <code>p31_real.jpg</code>, <code>p31_ai.jpg</code>처럼 31번부터 이어 붙이고, 팩 빌더에서 <b>사진 종류 → 원본 vs AI로 보정한 사진</b>을 고른 뒤 보정본마다 단서 종류(색조·대비·채도·안개·잘림·질감)와 한 줄 설명을 넣습니다.</li>
+      <li>남의 사진을 원본으로 쓰면 보정본은 2차 저작물입니다. <b>출처 메모</b>에 작가·라이선스·출처를 적고(정답 화면에 그대로 표시됩니다), CC BY-SA 사진은 보정본도 같은 라이선스로만 배포합니다.</li>
+    </ul>
+  </div>
+
+  <h2>진짜 사진을 구하기 어려울 때</h2>
+  <ul class="plain">
+    <li><b>직접 촬영</b>이 가장 안전합니다. 택배함과 택배 상자, 주차장의 트럭, 마트 물류 카트, 항만·물류센터 견학 사진이면 충분합니다.</li>
+    <li><b>공공누리 제1유형</b> 사진(해양수산부, 부산항만공사 등 공공기관 누리집)은 출처만 표기하면 쓸 수 있습니다. 사진마다 공공누리 표시를 확인하세요.</li>
+    <li><b>위키미디어 공용</b>의 CC0·CC BY 사진도 출처 표기 조건으로 쓸 수 있습니다. 다만 요즘은 AI 생성 이미지가 섞여 올라오니 촬영 정보(카메라 기종, 촬영일)가 있는 사진을 고르세요.</li>
+    <li>실존 기업의 로고가 크게 나온 사진은 피하거나 가립니다.</li>
+  </ul>
+
+  <h2>파일 이름과 폴더</h2>
+  <table>
+    <tr><th>비교 쌍 (p01~p20)</th><td><code>p01_real.jpg</code> 진짜 사진, <code>p01_ai.jpg</code> AI 사진</td></tr>
+    <tr><th>편집 쌍 (e01~e04)</th><td><code>e01_orig.jpg</code> 원본, <code>e01_edit.jpg</code> 손상을 덧붙인 편집본</td></tr>
+    <tr><th>출처 메모</th><td><code>sources.txt</code> 한 줄에 하나: <code>p01_real: 2026-10 부산신항 견학, 본인 촬영</code></td></tr>
+    <tr><th>크기·형식</th><td>JPG 또는 PNG, 긴 변 1,024px 이상. 앱에 넣을 때 크기 조정과 촬영 정보(EXIF) 삭제는 팩 빌더가 자동으로 합니다.</td></tr>
+  </table>
+  <p class="lead" style="margin-top:10px">AI 도구가 만든 원본 파일은 따로 보관해 두세요. 콘텐츠 자격증명(Content Credentials) 같은 'AI 생성물' 표시가 들어 있어, 수업에서 "출처 확인" 단계를 보여 줄 때 좋은 예시가 됩니다.</p>
+</div>
+<div id="toast" role="status"></div>
+
+<script>
+(function () {
+  var SUFFIX = ' Realistic smartphone photo, natural lighting, 4:3 aspect ratio, no watermark.';
+  var PAIRS = [
+    ['t1', 'p01', '컨테이너 야드', '컨테이너가 3~4단으로 쌓인 야드. 회사명과 컨테이너 번호가 보이게.', 'Container yard at a seaport, shipping containers stacked four high in red, blue and green, company names and container ID numbers clearly visible on the sides, overcast daylight.', '글자가 뭉개지거나 없는 알파벳, 번호 형식이 엉망(실제 번호는 영문 4자+숫자 7자)'],
+    ['t1', 'p02', '택배 상자를 든 손', '운송장이 붙은 상자를 두 손으로 든 모습. 얼굴은 빼고.', 'Close-up of two hands holding a cardboard parcel with a printed shipping label and barcode, a delivery van blurred in the background, daylight.', '손가락 개수와 관절, 바코드 줄무늬, 라벨 글자'],
+    ['t1', 'p03', '항만 입구 표지판', '항만·터미널 입구의 안내판이나 도로 표지판. 트럭이 줄 선 게이트.', 'Entrance of a port container terminal with a large information sign and road signs in Korean and English, trucks waiting at the gate, daytime.', '한글이 글자 모양만 흉내 냄, 화살표와 픽토그램이 이상함'],
+    ['t1', 'p04', '지게차 작업자', '안전조끼를 입은 작업자가 지게차로 팔레트를 옮기는 장면. 옆모습이나 뒷모습.', 'Warehouse worker in a yellow safety vest driving a forklift that carries a pallet of boxes, seen from the side, hands on the steering wheel, industrial warehouse interior.', '손과 팔의 위치, 지게차 포크와 팔레트가 맞물리는 부분, 조끼 반사띠 무늬'],
+    ['t1', 'p05', '화물 트럭 옆면', '물류회사 트럭의 옆면. 글자와 번호판이 보이게.', 'Side view of a large cargo truck with a company logo and a phone number printed on the trailer, Korean license plate, parked at a logistics center loading dock.', '로고 글자, 번호판 숫자, 바퀴 수와 간격'],
+    ['t1', 'p06', '창고 선반 라벨', '물류센터 선반(랙)에 붙은 바코드 라벨과 상자들. 긴 통로.', 'Interior of a logistics warehouse with tall shelving racks full of cardboard boxes, each shelf labeled with barcodes and location codes, long aisle perspective, fluorescent lighting.', '라벨 글자, 똑같이 복사된 듯한 상자 무늬, 어긋나는 원근선'],
+    ['t1', 'p07', '선박 옆면의 배 이름', '부두에 댄 배의 옆면. 배 이름과 선적항 글자가 보이게.', 'Container ship moored at a quay, the ship name and home port painted in large white letters on the dark hull, gantry cranes above, daylight.', '배 이름 글자, 흘수선 눈금 숫자, 크레인 구조'],
+    ['t1', 'p08', '크레인 여러 대', '부두에 늘어선 컨테이너 크레인.', 'Row of five tall blue gantry cranes at a container terminal, steel lattice structures and cables, a ship below, clear sky, wide-angle view.', '크레인 다리나 보가 허공에서 끊기거나 합쳐짐, 어디에도 연결되지 않은 케이블'],
+    ['t2', 'p09', '항해 중인 컨테이너선', '바다 위 컨테이너선과 물결. 해변이나 유람선에서 찍은 것.', 'Container ship sailing on the open sea, white bow wave and wake, containers stacked on deck, afternoon sunlight, photographed from a nearby boat.', '물결과 항적의 방향, 선체 반사, 선체에 비해 지나치게 높은 컨테이너 단'],
+    ['t2', 'p10', '밤의 항만', '밤의 부두. 조명과 물에 비친 빛.', 'Night view of a container port, bright floodlights reflecting on calm dark water, cranes lit up, long-exposure look.', '반사된 빛이 광원 위치와 어긋남, 그림자 방향이 제각각'],
+    ['t2', 'p11', '계류줄', '부두 기둥(계선주)에 묶인 굵은 밧줄. 가까이에서.', 'Thick mooring ropes tied to a steel bollard on a concrete quay, a ship hull in the background, close-up, overcast light.', '밧줄이 매듭에서 하나로 합쳐지거나 공중에 뜸, 꼬임 방향이 중간에 바뀜'],
+    ['t2', 'p12', '냉동창고 내부', '냉동·냉장 창고 안. 서리 낀 선반과 랩으로 감은 팔레트.', 'Inside a cold storage warehouse, frost on metal racks, pallets of frozen food wrapped in plastic, a worker in a thick jacket seen from behind, cold bluish lighting.', '서리와 입김의 물리, 플라스틱 랩의 반사, 반복되는 랙 구조'],
+    ['t2', 'p13', '터미널 항공 뷰', '드론이나 전망대에서 내려다본 컨테이너 터미널.', 'Aerial drone photo of a container terminal, neat grid of colorful containers, straddle carriers, a ship at berth, long shadows in late afternoon.', '물체마다 다른 그림자 방향, 멀어질수록 뒤틀리는 격자'],
+    ['t2', 'p14', '트레일러 바퀴와 섀시', '컨테이너 트레일러의 바퀴와 섀시 부분. 낮은 각도.', 'Low-angle photo of a container truck chassis and its rear wheels, mud flaps and air hoses, parked on asphalt, daylight.', '바퀴 수와 허브 중심, 어디에도 연결되지 않은 공기호스'],
+    ['t2', 'p15', '팔레트 적재', '랩으로 감은 팔레트 화물 여러 개. 바닥의 노란 선.', 'Several pallets of boxes shrink-wrapped in clear plastic, stacked two high in a warehouse, scuffed concrete floor with yellow lines.', '물리적으로 불가능한 쌓기(공중에 뜬 상자), 팔레트 밑에서 끊기는 바닥선'],
+    ['t2', 'p16', '비 온 뒤의 부두', '비 온 뒤 물웅덩이에 비친 크레인이나 트럭.', 'Rainy day at a port, puddles on the quay reflecting a crane and a truck, grey sky, wet concrete texture.', '물웅덩이에 비친 모습이 실제 물체와 다름(거울상 불일치)'],
+    ['t3', 'p17', '컨테이너 문 클로즈업', '컨테이너 문의 잠금 막대와 봉인(실). 글자 없이.', 'Close-up of a shipping container door with locking bars, handles and a security seal, weathered paint and rust, soft daylight, no text.', '잠금 막대 끝이 가이드와 맞지 않음, 경첩 개수. 단서가 거의 없어 출처 확인으로 이어 주는 문제'],
+    ['t3', 'p18', '수평선의 배', '해변에서 찍은, 멀리 지나가는 배.', 'Calm sea at sunrise, a cargo ship silhouette on the horizon, soft gradient sky, minimal composition.', '거의 없음. 수평선 기울기와 실루엣 비율 정도'],
+    ['t3', 'p19', '물류창고 외벽', '물류창고 외벽과 로딩 도크 셔터, 하늘. 간판 없이.', 'Exterior of a modern grey logistics warehouse with closed loading dock doors, empty parking lot, blue sky with a few clouds, no signs.', '거의 없음. 도크 번호와 셔터 간격의 규칙성'],
+    ['t3', 'p20', '운전석에서 본 고속도로', '트럭이나 버스 조수석에서 본 고속도로. 표지판은 피해서.', 'View through a truck windshield of a highway at dusk, red tail lights ahead, dashboard partly visible, no readable signs.', '차선 수가 중간에 바뀜, 계기판 글자. 단서 적음'],
+    ['t4', 'e01', '편집: 컨테이너 찌그러짐', '멀쩡한 컨테이너 옆면 사진(e01_orig)을 두고, 편집본에 찌그러짐과 긁힘을 추가.', 'Add a large dent and scraped paint to the side of this shipping container. Keep everything else unchanged.', '찌그러진 부분의 빛과 그림자, 주변 녹과 이어지는지'],
+    ['t4', 'e02', '편집: 젖은 택배 상자', '멀쩡한 택배 상자 사진(e02_orig)에, 편집본은 젖은 얼룩과 찢어진 모서리를 추가.', 'Add a dark water stain and a torn corner to this cardboard parcel. Keep the label and background unchanged.', '얼룩의 번짐 방향, 찢어진 단면의 종이 결'],
+    ['t4', 'e03', '편집: 무너진 팔레트', '가지런한 팔레트 화물 사진(e03_orig)에, 편집본은 무너진 상자 몇 개를 추가.', 'Make a few boxes on this pallet collapsed and crushed, as if damaged in transit. Keep the warehouse background unchanged.', '무너진 상자의 그림자, 랩이 찢어졌는지 여부'],
+    ['t4', 'e04', '편집: 트럭 앞유리의 금', '트럭 앞유리 사진(e04_orig)에, 편집본은 금(crack)을 추가. 보험업계가 실제로 보고한 수법.', 'Add a long crack with a small impact point to this truck windshield. Keep the reflections and background unchanged.', '금이 유리 반사와 어울리는지, 충격점에서 퍼지는 방향']
+  ];
+  var TIER = { t1: '쉬움', t2: '중간', t3: '어려움', t4: '편집' };
+  var store = { get: function () { try { return JSON.parse(localStorage.getItem('aiphoto-guide-done') || '{}'); } catch (e) { return {}; } }, set: function (v) { try { localStorage.setItem('aiphoto-guide-done', JSON.stringify(v)); } catch (e) {} } };
+  var done = store.get();
+  var filter = 'all';
+  var host = document.getElementById('cards');
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function fullPrompt(p) { return p[0] === 't4' ? p[4] : p[4] + SUFFIX; }
+  function files(p) { return p[0] === 't4' ? p[1] + '_orig.jpg · ' + p[1] + '_edit.jpg' : p[1] + '_real.jpg · ' + p[1] + '_ai.jpg'; }
+  function render() {
+    host.innerHTML = PAIRS.filter(function (p) { return filter === 'all' || p[0] === filter; }).map(function (p) {
+      var id = p[1];
+      return '<article class="card' + (done[id] ? ' done' : '') + '" data-id="' + id + '">' +
+        '<div class="head"><span class="tier ' + p[0] + '">' + TIER[p[0]] + '</span><span class="id">' + id.toUpperCase() + '</span><span class="title">' + esc(p[2]) + '</span></div>' +
+        '<div class="row"><span class="k">' + (p[0] === 't4' ? '원본 사진' : '진짜 사진') + '</span><span>' + esc(p[3]) + '</span></div>' +
+        '<div class="row"><span class="k">' + (p[0] === 't4' ? '편집 지시' : 'AI 프롬프트') + '</span><div class="prompt"><code id="pr-' + id + '">' + esc(fullPrompt(p)) + '</code></div></div>' +
+        '<div class="row"><span class="k">확인 포인트</span><span>' + esc(p[5]) + '</span></div>' +
+        '<div class="actions"><button type="button" class="copy" data-copy="' + id + '">프롬프트 복사</button><label class="check"><input type="checkbox" data-done="' + id + '"' + (done[id] ? ' checked' : '') + '> 만들었어요</label></div>' +
+        '<div class="files">' + files(p) + '</div></article>';
+    }).join('');
+    var n = Object.keys(done).filter(function (k) { return done[k]; }).length;
+    document.getElementById('prog-text').textContent = '완료 ' + n + ' / ' + PAIRS.length;
+    document.getElementById('prog-bar').style.width = (n / PAIRS.length * 100) + '%';
+  }
+  function toast(m) { var t = document.getElementById('toast'); t.textContent = m; t.classList.add('show'); clearTimeout(t._h); t._h = setTimeout(function () { t.classList.remove('show'); }, 1600); }
+  document.addEventListener('click', function (e) {
+    var f = e.target.closest('[data-f]');
+    if (f) { filter = f.dataset.f; document.querySelectorAll('[data-f]').forEach(function (b) { b.setAttribute('aria-pressed', String(b === f)); }); render(); return; }
+    var c = e.target.closest('[data-copy]');
+    if (c) {
+      var el = document.getElementById('pr-' + c.dataset.copy); var text = el.textContent;
+      var ok = function () { toast('복사했어요. 이미지 생성 도구에 붙여 넣으세요'); };
+      var fail = function () { var r = document.createRange(); r.selectNodeContents(el); var s = getSelection(); s.removeAllRanges(); s.addRange(r); toast('길게 눌러 복사하세요'); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(ok, fail); else fail();
+    }
+  });
+  document.addEventListener('change', function (e) {
+    var d = e.target.closest('[data-done]'); if (!d) return;
+    done[d.dataset.done] = d.checked; store.set(done); render();
+  });
+  render();
+})();
+</script>

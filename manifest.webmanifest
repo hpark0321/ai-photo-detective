@@ -1,0 +1,33 @@
+{
+  "name": "AI 사진 탐정",
+  "short_name": "AI 사진 탐정",
+  "description": "진짜 사진과 AI 사진을 가려내며 AI 시대의 사진 읽기를 배우는 게임. 수업용과 아이스브레이커용 두 모드.",
+  "lang": "ko",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#EEF1F4",
+  "theme_color": "#14202B",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
